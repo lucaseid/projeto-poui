@@ -15,12 +15,11 @@ import { TabelaDinamicaComponent } from './components/tabela-dinamica/tabela-din
   standalone: true,
   imports: [
     CommonModule,
-    RouterOutlet,
     PoToolbarModule,
     PoMenuModule,
-    PoPageModule,   
+    PoPageModule,
     TabelaDinamicaComponent
-  ],
+],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })

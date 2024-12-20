@@ -1,4 +1,5 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
+ 
 
 import { PoBreadcrumb, PoDynamicModule, PoDynamicViewField, PoModalComponent, PoModalModule } from '@po-ui/ng-components';
 import {
@@ -7,6 +8,7 @@ import {
   PoPageDynamicTableCustomTableAction,
   PoPageDynamicTableModule
 } from '@po-ui/ng-templates';
+import { DatasulService } from '../../services/datasul.service';
 
 @Component({
   selector: 'app-tabela-dinamica',
@@ -19,14 +21,30 @@ import {
     PoDynamicModule
   ]
 })
-export class TabelaDinamicaComponent {
+export class TabelaDinamicaComponent implements OnInit {
 
-  @ViewChild('hotelDetailModal') hotelDetailModal!: PoModalComponent;
+  datasul: any[] = [];
 
-  readonly serviceApi = 'https://po-sample-api.onrender.com/v1/hotels';
+  constructor(private datasulService: DatasulService) {}
+
+  ngOnInit(): void {
+    this.datasulService.getAll().subscribe(data => {
+      this.datasul = data.items;
+    })
+  }
+
+  @ViewChild('logDetailModal') logDetailModal!: PoModalComponent;
+ 
+  formatDate(date: Date): string {
+    const today = new Date();
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const year = today.getFullYear();
+    return `${day}/${month}/${year}`;
+}
 
   actionsRight = true;
-  detailedHotel: any;
+  logAudit: any;
   quickSearchWidth: number = 3;
   hideRemoveAllDisclaimer = false;
   hideCloseDisclaimers: Array<string> = ['address_city'];
@@ -38,134 +56,45 @@ export class TabelaDinamicaComponent {
   };
 
   readonly breadcrumb: PoBreadcrumb = {
-    items: [{ label: 'Home', link: '/' }, { label: 'Hotel' }]
+    items: [{ label: 'Home', link: '/' }, { label: 'Consulta de Registros' }]
   };
-
-  readonly cityOptions: Array<object> = [
-    { value: 'São Paulo', label: 'São Paulo' },
-    { value: 'Uberaba', label: 'Uberaba' },
-    { value: 'São benedito', label: 'São benedito' },
-    { value: 'Belford Roxo', label: 'Belford Roxo' },
-    { value: 'Vila Velha', label: 'Vila Velha' },
-    { value: 'Mogi das Cruzes', label: 'Mogi das Cruzes' },
-    { value: 'Minas Gerais', label: 'Minas Gerais' }
-  ];
-
-  readonly categoryOptions: Array<object> = [
-    { value: 'Simples', label: 'Simples' },
-    { value: 'Luxo', label: 'Luxo' }
-  ];
-
+ 
+  
   readonly fields: Array<any> = [
     { property: 'id', key: true, visible: false },
-    { property: 'name', label: 'Name', width: '115px', filter: true, gridColumns: 6 },
+    { property: 'tela', label: 'Nome da Tela', width: '115px', filter: true, gridColumns: 6 },
     {
-      property: 'floors',
-      label: 'Floors',
+      property: 'data-ini',
+      label: 'Data Início',
       filter: true,
       gridColumns: 6,
-      initValue: 10
-    },
+      initValue: this.formatDate(new Date())  
+    },  
     {
-      property: 'category',
-      label: 'Category',
+      property: 'data-fim',
+      label: 'Data Fim',
       filter: true,
-      options: this.categoryOptions,
-      initValue: 'Luxo',
-      gridColumns: 6
-    },
-    {
-      property: 'address_city',
-      label: 'City',
-      filter: true,
-      options: this.cityOptions,
-      gridColumns: 12,
-      initValue: 'Mogi das Cruzes'
-    }
+      gridColumns: 6,
+      initValue: this.formatDate(new Date())  
+    },  
   ];
 
   readonly detailFields: Array<PoDynamicViewField> = [
-    { property: 'name', gridLgColumns: 4, divider: 'Info' },
-    { property: 'category', tag: true, gridLgColumns: 4 },
-    { property: 'floors', gridLgColumns: 4 },
-    { property: 'cnpj', label: 'CNPJ', gridLgColumns: 4 },
-    { property: 'address_street', label: 'Street', divider: 'Address' },
-    { property: 'address_number', label: 'Number' },
-    { property: 'address_zip', label: 'Zip Code' },
-    { property: 'address_city', label: 'City' },
-    { property: 'address_district', label: 'District' },
-    { property: 'email', label: 'email', gridLgColumns: 6, divider: 'Contact' },
-    { property: 'phone', gridLgColumns: 4 }
+    { property: 'tela', gridLgColumns: 4, divider: 'Info' },
+    { property: 'data', gridLgColumns: 4 }    
   ];
-
-  pageCustomActions: Array<PoPageDynamicTableCustomAction> = [
-    {
-      label: 'Hide Remove All Disclaimer',
-      action: this.onClickRemoveAllDisclaimer.bind(this),
-      visible: this.isVisibleRemoveAllDisclaimer.bind(this),
-      icon: 'ph ph-eye-closed'
-    },
-    {
-      label: 'Show Remove All Disclaimer',
-      action: this.onClickRemoveAllDisclaimer.bind(this),
-      visible: this.isHideRemoveAllDisclaimer.bind(this),
-      icon: 'ph ph-eye'
-    },
-    {
-      label: 'Hide Close City Disclaimer',
-      action: this.onClickCloseCityDisclaimer.bind(this),
-      visible: this.isVisibleCloseCityDisclaimer.bind(this),
-      icon: 'ph ph-eye-closed'
-    },
-    {
-      label: 'Show Close City Disclaimer',
-      action: this.onClickCloseCityDisclaimer.bind(this),
-      visible: this.isHideCloseCityDisclaimer.bind(this),
-      icon: 'ph ph-eye'
-    }
-  ];
-
+ 
   tableCustomActions: Array<PoPageDynamicTableCustomTableAction> = [
     {
       label: 'Details',
-      action: this.onClickHotelDetail.bind(this),
+      action: this.onClickLogDetail.bind(this),
       icon: 'ph ph-user'
     }
-  ];
+  ]; 
 
-  constructor() {}
-
-  private onClickHotelDetail(hotel: any) {
-    this.detailedHotel = hotel;
-
-    this.hotelDetailModal.open();
+  private onClickLogDetail(audit: any) {
+    this.logAudit = audit;
+    this.logDetailModal.open();
   }
-
-  private onClickRemoveAllDisclaimer() {
-    this.hideRemoveAllDisclaimer = !this.hideRemoveAllDisclaimer;
-  }
-
-  private isVisibleRemoveAllDisclaimer() {
-    return !this.hideRemoveAllDisclaimer;
-  }
-
-  private isHideRemoveAllDisclaimer() {
-    return this.hideRemoveAllDisclaimer;
-  }
-
-  private onClickCloseCityDisclaimer() {
-    if (this.hideCloseDisclaimers.length > 0) {
-      this.hideCloseDisclaimers = [];
-    } else {
-      this.hideCloseDisclaimers = ['address_city'];
-    }
-  }
-
-  private isVisibleCloseCityDisclaimer() {
-    return this.hideCloseDisclaimers.length <= 0;
-  }
-
-  private isHideCloseCityDisclaimer() {
-    return this.hideCloseDisclaimers.length > 0;
-  }
+ 
 }

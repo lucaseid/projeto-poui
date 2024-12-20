@@ -2,10 +2,9 @@
   [p-auto-router]="true"
   [p-concat-filters]="true"
   [p-keep-filters]="true"
-  p-title="Hotels"
+  p-title="Registros Auditoria de Etiqueta"
   [p-actions]="actions"
-  [p-actions-right]="actionsRight"
-  [p-page-custom-actions]="pageCustomActions"
+  [p-actions-right]="actionsRight"  
   [p-table-custom-actions]="tableCustomActions"
   [p-breadcrumb]="breadcrumb"
   [p-fields]="fields"
@@ -17,6 +16,6 @@
 >
 </po-page-dynamic-table>
 
-<po-modal #hotelDetailModal p-title="Hotel Detail">
-  <po-dynamic-view [p-fields]="detailFields" [p-value]="detailedHotel"> </po-dynamic-view>
+<po-modal #logDetailModal p-title="Detalhes do Log">
+  <po-dynamic-view [p-fields]="detailFields" [p-value]="logAudit"> </po-dynamic-view>
 </po-modal>
