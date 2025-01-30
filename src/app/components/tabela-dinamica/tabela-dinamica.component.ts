@@ -17,12 +17,11 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
     PoModalModule,
     PoDynamicModule,
     HttpClientModule // Importar o HttpClientModule aqui
-  ],
- 
- 
+  ], 
 })
 export class TabelaDinamicaComponent implements OnInit {
   datasul: any[] = [];
+  dados: any;
   public carregandoTabela = false;   
 
   constructor(private datasulService: DatasulService, private cdr: ChangeDetectorRef) {}
