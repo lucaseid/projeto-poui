@@ -1,6 +1,6 @@
 <po-page-dynamic-table
-  [p-auto-router]="true"
-  [p-concat-filters]="true"
+  [p-auto-router]="false"
+  [p-concat-filters]="false"
   [p-keep-filters]="true"
   p-title="Registros Auditoria de Etiqueta"
   [p-actions]="actions"
@@ -8,13 +8,14 @@
   [p-table-custom-actions]="tableCustomActions"
   [p-breadcrumb]="breadcrumb"
   [p-fields]="fields"
-  [p-service-api]="serviceApi"
   [p-quick-search-width]="quickSearchWidth"
   [p-hide-remove-all-disclaimer]="hideRemoveAllDisclaimer"
   [p-hide-close-disclaimers]="hideCloseDisclaimers"
   [p-text-wrap]="true"
+  {p-service-api="{ serviceS }"}
 >
 </po-page-dynamic-table>
+
 
 <po-modal #logDetailModal p-title="Detalhes do Log">
   <po-dynamic-view [p-fields]="detailFields" [p-value]="logAudit"> </po-dynamic-view>
