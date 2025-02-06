@@ -1,9 +1,9 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { PoBreadcrumb, PoDynamicModule, PoDynamicViewField, PoModalComponent, PoModalModule } from '@po-ui/ng-components';
 import { PoPageDynamicTableActions, PoPageDynamicTableCustomAction, PoPageDynamicTableCustomTableAction, PoPageDynamicTableModule, PoPageDynamicTableOptions } from '@po-ui/ng-templates';
-import { HttpClient} from '@angular/common/http'; 
+import { HttpClient } from '@angular/common/http';
 import { InterceptorsModule } from '../../interceptors/interceptors.module';
- 
+
 
 @Component({
   selector: 'app-tabela-dinamica',
@@ -14,23 +14,23 @@ import { InterceptorsModule } from '../../interceptors/interceptors.module';
     PoPageDynamicTableModule,
     PoModalModule,
     PoDynamicModule,
-    InterceptorsModule 
-     
-    
-  ], 
-   
+    InterceptorsModule
+
+
+  ],
+
 })
 
- 
+
 export class TabelaDinamicaComponent implements OnInit {
-  
+
   dados: any[] = [];
   tabelaData: any[] = [];
-  public carregandoTabela = false;   
+  public carregandoTabela = false;
   readonly serviceApi = 'http://192.168.1.240:8180/api/csp/v1/api-poui';
-  
 
-   ngOnInit(): void {
+
+  ngOnInit(): void {
     this.getInterceptorAPI();
   }
 
@@ -38,47 +38,47 @@ export class TabelaDinamicaComponent implements OnInit {
     console.log('Dados recebidos pela tabela:', event);
   }
 
-constructor(private _http: HttpClient) { }
- 
-isHideLoading: boolean = true;
+  constructor(private _http: HttpClient) { }
 
-getInterceptorAPI() {
-  this.isHideLoading = false;
-  return this._http.get<ApiResponse>(this.serviceApi)
-    .subscribe({
-      next: (response: ApiResponse) => {
-        this.isHideLoading = true;
-        console.log('Resposta completa:', response);
-        
-        // Verifica se response.items contém 15 itens
-        console.log('Itens:', response.items);
-        
-        this.dados = response.items;
-        localStorage.setItem('data', JSON.stringify(response.items));
-        
-        this.tabelaData = response.items;
-        console.log('Dados da tabela:', this.tabelaData);
-      },
-      error: (err) => {
-        this.isHideLoading = true;
-        console.error('Erro na requisição:', err);
-      }
-    });
-}
+  isHideLoading: boolean = true;
 
-onLoad(): PoPageDynamicTableOptions {
-  return {
-    fields: [
-      { property: 'cod-etiqueta', label: 'Código', key: true, visible: true, filter: true },
-      { property: 'dt-event', label: 'Data', filter: true, gridColumns: 6 },
-      
-    ]
-  };
-}
- 
+  getInterceptorAPI() {
+    this.isHideLoading = false;
+    return this._http.get<ApiResponse>(this.serviceApi)
+      .subscribe({
+        next: (response: ApiResponse) => {
+          this.isHideLoading = true;
+          console.log('Resposta completa:', response);
+
+          // Verifica se response.items contém 15 itens
+          console.log('Itens:', response.items);
+
+          this.dados = response.items;
+          localStorage.setItem('data', JSON.stringify(response.items));
+
+          this.tabelaData = response.items;
+          console.log('Dados da tabela:', this.tabelaData);
+        },
+        error: (err) => {
+          this.isHideLoading = true;
+          console.error('Erro na requisição:', err);
+        }
+      });
+  }
+
+  onLoad(): PoPageDynamicTableOptions {
+    return {
+      fields: [
+        { property: 'cod-etiqueta', label: 'Código', key: true, visible: true, filter: true },
+        { property: 'dt-event', label: 'Data', filter: true, gridColumns: 6 },
+
+      ]
+    };
+  }
+
 
   @ViewChild('logDetailModal') logDetailModal!: PoModalComponent;
- 
+
   formatDate(date: Date): string {
     const today = new Date();
     const day = today.getDate().toString().padStart(2, '0');
@@ -97,7 +97,7 @@ onLoad(): PoPageDynamicTableOptions {
     new: '/documentation/po-page-dynamic-edit',
     remove: true,
     removeAll: true,
-    
+
   };
 
   readonly breadcrumb: PoBreadcrumb = {
@@ -122,7 +122,7 @@ onLoad(): PoPageDynamicTableOptions {
     this.logDetailModal.open();
   }
 
- 
+
 }
 
 interface ApiResponse {
