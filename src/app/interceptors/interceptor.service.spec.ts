@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DatasulService } from './datasul.service';
+import { InterceptorService } from './interceptor.service';
 
-describe('DatasulService', () => {
-  let service: DatasulService;
+describe('InterceptorService', () => {
+  let service: InterceptorService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(DatasulService);
+    service = TestBed.inject(InterceptorService);
   });
 
   it('should be created', () => {

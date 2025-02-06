@@ -4,19 +4,12 @@
   [p-keep-filters]="true"
   p-title="Registros Auditoria de Etiqueta"
   [p-actions]="actions"
-  [p-actions-right]="actionsRight"  
+  [p-actions-right]="actionsRight"
   [p-table-custom-actions]="tableCustomActions"
-  [p-breadcrumb]="breadcrumb"
-  [p-fields]="fields"
-  [p-quick-search-width]="quickSearchWidth"
-  [p-hide-remove-all-disclaimer]="hideRemoveAllDisclaimer"
-  [p-hide-close-disclaimers]="hideCloseDisclaimers"
+  [p-breadcrumb]="breadcrumb"   
+  [p-quick-search-width]="3"
+  [p-hide-remove-all-disclaimer]="true"   
   [p-text-wrap]="true"
-  p-service-api="http://192.168.1.240:8180/api/csp/v1/api-poui" 
->
+  p-service-api="http://192.168.1.240:8180/api/csp/v1/api-poui"
+  [p-load]="onLoad.bind(this)"> <!-- Adicione este evento -->
 </po-page-dynamic-table>
-
-
-<po-modal #logDetailModal p-title="Detalhes do Log">
-  <po-dynamic-view [p-fields]="detailFields" [p-value]="logAudit"> </po-dynamic-view>
-</po-modal>

@@ -1,11 +1,9 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { PoBreadcrumb, PoDynamicModule, PoDynamicViewField, PoModalComponent, PoModalModule } from '@po-ui/ng-components';
-import { PoPageDynamicTableActions, PoPageDynamicTableCustomAction, PoPageDynamicTableCustomTableAction, PoPageDynamicTableModule } from '@po-ui/ng-templates';
-import { DatasulService } from '../../services/datasul.service';
-import { ChangeDetectorRef } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { PoPageDynamicTableActions, PoPageDynamicTableCustomAction, PoPageDynamicTableCustomTableAction, PoPageDynamicTableModule, PoPageDynamicTableOptions } from '@po-ui/ng-templates';
+import { HttpClient} from '@angular/common/http'; 
+import { InterceptorsModule } from '../../interceptors/interceptors.module';
  
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 @Component({
   selector: 'app-tabela-dinamica',
@@ -16,68 +14,71 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
     PoPageDynamicTableModule,
     PoModalModule,
     PoDynamicModule,
-    HttpClientModule // Importar o HttpClientModule aqui
+    InterceptorsModule 
+     
+    
   ], 
+   
 })
+
+ 
 export class TabelaDinamicaComponent implements OnInit {
-  datasul: any[] = [];
-  dados: any;
+  
+  dados: any[] = [];
+  tabelaData: any[] = [];
   public carregandoTabela = false;   
+  readonly serviceApi = 'http://192.168.1.240:8180/api/csp/v1/api-poui';
+  
 
-  constructor(private datasulService: DatasulService, private cdr: ChangeDetectorRef) {}
+   ngOnInit(): void {
+    this.getInterceptorAPI();
+  }
 
-  ngOnInit(): void {
-    this.datasulService.getAll().subscribe(data => {
-      console.log('Dados recebidos da API:', data);
-      if (data && Array.isArray(data.items)) {
-        this.datasul = data.items; // Acesse a propriedade 'items' se existir
-        console.log(this.datasul); // Verifique se os dados estão corretos
-        this.mapFields();
-      } else {
-        console.error('Dados não encontrados ou estrutura inválida:', data);
+  onLoadData(event: any) {
+    console.log('Dados recebidos pela tabela:', event);
+  }
+
+constructor(private _http: HttpClient) { }
+ 
+isHideLoading: boolean = true;
+
+getInterceptorAPI() {
+  this.isHideLoading = false;
+  return this._http.get<ApiResponse>(this.serviceApi)
+    .subscribe({
+      next: (response: ApiResponse) => {
+        this.isHideLoading = true;
+        console.log('Resposta completa:', response);
+        
+        // Verifica se response.items contém 15 itens
+        console.log('Itens:', response.items);
+        
+        this.dados = response.items;
+        localStorage.setItem('data', JSON.stringify(response.items));
+        
+        this.tabelaData = response.items;
+        console.log('Dados da tabela:', this.tabelaData);
+      },
+      error: (err) => {
+        this.isHideLoading = true;
+        console.error('Erro na requisição:', err);
       }
-    },
-    error => {
-      console.error('Erro ao buscar dados:', error);
     });
-  }
+}
 
-  private mapFields(): void {
-    if (this.datasul.length > 0) {
-      console.log('Dados a serem mapeados:', this.datasul);
-      this.fields.forEach(field => {
-        field.value = this.datasul.map(item => {
-          console.log('Campo:', field.property, 'Valor:', item[field.property]);
-          return item[field.property] || '';
-        });
-      });
-      console.log('Fields atualizados:', this.fields);
-      this.cdr.detectChanges(); // Notifique o Angular sobre as mudanças
-    } else {
-      console.warn('Nenhum dado disponível para mapear os campos.');
-    }
-  }
+onLoad(): PoPageDynamicTableOptions {
+  return {
+    fields: [
+      { property: 'cod-etiqueta', label: 'Código', key: true, visible: true, filter: true },
+      { property: 'dt-event', label: 'Data', filter: true, gridColumns: 6 },
+      
+    ]
+  };
+}
+ 
 
   @ViewChild('logDetailModal') logDetailModal!: PoModalComponent;
-
-  readonly fields: Array<any> = [
-    {
-      property: 'cod-etiqueta',
-      label: 'Código da Etiqueta',
-      width: '115px',
-      filter: true,
-      gridColumns: 6,
-      value: [] // Inicialize como um array vazio
-    },
-    {
-      property: 'dt-event',
-      label: 'Data do Evento',
-      filter: true,
-      gridColumns: 6,
-      value: [] // Inicialize como um array vazio
-    }
-  ];
-
+ 
   formatDate(date: Date): string {
     const today = new Date();
     const day = today.getDate().toString().padStart(2, '0');
@@ -120,4 +121,15 @@ export class TabelaDinamicaComponent implements OnInit {
     this.logAudit = audit;
     this.logDetailModal.open();
   }
+
+ 
+}
+
+interface ApiResponse {
+  total: number;
+  hasNext: boolean;
+  items: Array<{
+    'cod-etiqueta': string;
+    'dt-event': string;
+  }>;
 }
